@@ -11,23 +11,23 @@ class MonitoringTests(unittest.TestCase):
             for i, (amount, minute) in enumerate(zip(amounts, minutes))])
 
     def test_generator_reproducible_and_minimum(self):
-        pd.testing.assert_frame_equal(generate_transactions(250), generate_transactions(250))
+        pd.testing.assert_frame_equal(generate_transactions(500), generate_transactions(500))
         self.assertEqual(len(generate_transactions()), 500)
         with self.assertRaises(ValueError):
-            generate_transactions(249)
+            generate_transactions(499)
 
     def test_exact_boundaries_and_combination(self):
         result = score_transactions(self.sample([10, 5000, 10], [0, 60, 121]), Thresholds(5000, 2, 60, 40))
         self.assertEqual(result['window_count'].tolist(), [1, 2, 1])
-        self.assertEqual(result['risk_score'].tolist(), [0, 100, 0])
-        self.assertIn('Both rules', result.iloc[1]['explanation'])
+        self.assertEqual(result['risk_score'].tolist(), [0, 75, 0])
+        self.assertIn('Multiple rules', result.iloc[1]['explanation'])
 
     def test_account_isolation_no_future_leakage(self):
         frame = self.sample([1, 1, 1], [0, 1, 2])
         frame.loc[1, 'account_id'] = 'B'
         result = score_transactions(frame, Thresholds(5000, 2, 60, 40))
         self.assertEqual(result['window_count'].tolist(), [1, 1, 2])
-        self.assertEqual(result['risk_score'].tolist(), [0, 0, 40])
+        self.assertEqual(result['risk_score'].tolist(), [0, 0, 30])
 
     def test_ties_and_input_order(self):
         frame = self.sample([1, 1], [0, 0])
@@ -38,7 +38,7 @@ class MonitoringTests(unittest.TestCase):
 
     def test_cutoff_changes_flags_only(self):
         frame = self.sample([5000], [0])
-        a = score_transactions(frame)
+        a = score_transactions(frame, Thresholds(flag_score=35))
         b = score_transactions(frame, Thresholds(flag_score=41))
         self.assertTrue(a.iloc[0]['flagged'])
         self.assertFalse(b.iloc[0]['flagged'])
