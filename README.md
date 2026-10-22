@@ -1,5 +1,9 @@
 # Project 9 · Financial Fraud and Transaction Monitoring
 
+## Video Demonstration
+
+[Watch the Sentinel Fraud Monitoring Demonstration](https://drive.google.com/file/d/1kyaQtqhwGkY4YDd38A0UDhMgBqEx65sn/view?usp=sharing)
+
 **Sentinel** is a Python 3.9 / Streamlit / Plotly prototype for a college finance course. It demonstrates transparent screening of fictional banking activity. Alerts require investigation and do not prove fraud. Scores are review priorities, never probabilities of fraud.
 
 ## Install and launch
